@@ -33,6 +33,7 @@ public class Graph {
                 .findFirst().get();
     }
 
+    //Busca a proxima regiao adjacente de uma regiao dada
     public Region getNextAdj(Region r) {
         if (r.hasAdjRegion()) {
             LinkedList<String> list = r.getAdjRegion();
@@ -45,17 +46,19 @@ public class Graph {
         return null;
     }
 
-    public Region getNextFC(Region r) {
-        Comparator<Region> byRemainingColors = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
-        return regions.stream().max(byRemainingColors).get();
+    //Busca a proxima regiao com maior quantidade de cores possiveis
+    public Region getNextFC() {
+        return regions.stream().max(Comparator.comparing(r -> r.nRemainingColors())).get();
     }
 
+    //Verifica se todas as regioes ainda possuem cores possiveis remanescentes
     public boolean fowardChecking () {
         for (Region r : regions)
             if (r.nRemainingColors() == 0) return false;
         return true;
     }
 
+    //Verifica se todas as regioes adjacentes de uma regiao dada possuem cores diferentes
     public boolean verifyAdjRegions(Region region) {
         int color = region.getColor();
         if (region.hasAdjRegion()) {
@@ -70,6 +73,7 @@ public class Graph {
         return false;
     }
 
+    //Atualiza as cores possiveis remanescentes do grafo de acordo com uma coloracao feita
     public void refreshPossibleColors(Region region, int c) {
         region.setColor(c);
         if (region.hasAdjRegion()) {
@@ -80,6 +84,7 @@ public class Graph {
         }
     }
 
+    //Reverte uma coloracao feita caso ela nao seja valida
     public void resetPossibleColors(Region region) {
         if (region.hasAdjRegion()) {
             for (String name : region.getAdjRegion()) {
@@ -93,7 +98,7 @@ public class Graph {
     public void backtraking(char h) {
         for (Region r : regions) {
             if (r.getColor() == 0) {
-                //Escolha da heuristica
+                //Escolha de heuristica
                 switch (h) {
                     //Backtracking simples
                     case 'a':
@@ -130,17 +135,15 @@ public class Graph {
     }
 
     public boolean backtrakingFC(Region r) {
-        for (Integer c : r.getRemainingColors()) {
+        for (int c : r.getRemainingColors()) {
             refreshPossibleColors(r, c);
-            if(fowardChecking()) {
-                Region next = getNextFC(r);
-                if (next == null)
-                    return true;
-                else
+            if (fowardChecking()) {
+                Region next = getNextFC();
+                if (next.getColor() == 0)
                     return backtrakingFC(next);
+                else return true;
             }
         }
-        resetPossibleColors(r);
         return false;
     }
 
