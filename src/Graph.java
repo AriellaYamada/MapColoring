@@ -51,6 +51,11 @@ public class Graph {
         return regions.stream().max(Comparator.comparing(r -> r.nRemainingColors())).get();
     }
 
+    //Busca a proxima regiao com possibilidades mais restritas
+    public Region getNextMVR() {
+        return regions.stream().min(Comparator.comparing(r -> r.nRemainingColors())).get();
+    }
+
     //Verifica se todas as regioes ainda possuem cores possiveis remanescentes
     public boolean fowardChecking () {
         for (Region r : regions)
@@ -110,6 +115,7 @@ public class Graph {
                         break;
                     //Backtracking com verificacao adiante e MVR
                     case 'c':
+                        backtrakingFCMVR(r);
                         break;
                     //Backtracking com verificacao adiante, MVR e grau
                     case 'd':
@@ -139,6 +145,20 @@ public class Graph {
             refreshPossibleColors(r, c);
             if (fowardChecking()) {
                 Region next = getNextFC();
+                if (next.getColor() == 0)
+                    return backtrakingFC(next);
+                else return true;
+            }
+            resetPossibleColors(r);
+        }
+        return false;
+    }
+
+    public boolean backtrakingFCMVR(Region r) {
+        for (int c : r.getRemainingColors()) {
+            refreshPossibleColors(r, c);
+            if (fowardChecking()) {
+                Region next = getNextMVR();
                 if (next.getColor() == 0)
                     return backtrakingFC(next);
                 else return true;
