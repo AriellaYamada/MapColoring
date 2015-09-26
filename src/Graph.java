@@ -1,8 +1,5 @@
 import java.sql.Time;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,6 +43,15 @@ public class Graph {
         return null;
     }
 
+    public List<Region> getRegionsByDegree() {
+        LinkedList<Region> degree = new LinkedList<>();
+        for (Region r : this.regions) {
+            degree.add(r);
+        }
+        Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
+        return degree.stream().sorted(byDegree).collect(Collectors.toList());
+    }
+
     //Busca a proxima regiao com maior quantidade de cores possiveis
     public Region getNextFC() {
         return regions.stream().max(Comparator.comparing(r -> r.nRemainingColors())).get();
@@ -54,6 +60,13 @@ public class Graph {
     //Busca a proxima regiao com possibilidades mais restritas
     public Region getNextMVR() {
         return regions.stream().min(Comparator.comparing(r -> r.nRemainingColors())).get();
+    }
+
+    public Region getNextByMVRandDegree() {
+        Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
+        Comparator<Region> MVR = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
+        this.regions.sort(MVR.thenComparing(byDegree.reversed()));
+        return this.regions.getFirst();
     }
 
     //Verifica se todas as regioes ainda possuem cores possiveis remanescentes
@@ -119,6 +132,8 @@ public class Graph {
                         break;
                     //Backtracking com verificacao adiante, MVR e grau
                     case 'd':
+                        r = getNextByMVRandDegree();
+                        backtrakingFCMVR(r);
                         break;
                 }
             }
@@ -158,7 +173,21 @@ public class Graph {
         for (int c : r.getRemainingColors()) {
             refreshPossibleColors(r, c);
             if (fowardChecking()) {
-                Region next = getNextMVR();
+                Region next = getNextByMVRandDegree();
+                if (next.getColor() == 0)
+                    return backtrakingFCMVR(next);
+                else return true;
+            }
+            resetPossibleColors(r);
+        }
+        return false;
+    }
+
+    public boolean backtrakingFCMVRByDegree(Region r) {
+        for (int c : r.getRemainingColors()) {
+            refreshPossibleColors(r, c);
+            if (fowardChecking()) {
+                Region next = getNextByMVRandDegree();
                 if (next.getColor() == 0)
                     return backtrakingFC(next);
                 else return true;
