@@ -1,4 +1,4 @@
-42
+42 a
 Portugal: Spain.
 Spain: Andorra, France, Portugal.
 Andorra: France, Spain.
@@ -34,7 +34,6 @@ Norway: Finland, Russia, Sweden.
 Moldova: Romania, Ukraine.
 Bosnia: Croatia, Montenegro, Serbia.
 Montenegro: Albania, Bosnia, Croatia, Kosovo, Serbia.
-Serbia: Bosnia, Bulgaria, Croatia, Hungary, Kosovo, Macedonia, Montenegro, Roamania.
 Bulgaria: Greece, Macedonia, Romania, Serbia.
 Macedonia: Albania, Bulgaria, Greece, Kosovo, Serbia.
 Sweden: Finland, Norway.

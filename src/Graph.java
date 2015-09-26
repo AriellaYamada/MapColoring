@@ -11,6 +11,8 @@ public class Graph {
     private LinkedList<Region> regions;
     private Stream<Region> stream;
     private LinkedList<Region> ordered;
+    private Comparator<Region> MVR = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
+    private Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
 
     public Graph(int size) {
         this.size = size;
@@ -46,18 +48,10 @@ public class Graph {
         return null;
     }
 
-    public List<Region> getRegionsByDegree() {
-        LinkedList<Region> degree = new LinkedList<>();
-        for (Region r : this.regions) {
-            degree.add(r);
-        }
-        Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
-        return degree.stream().sorted(byDegree).collect(Collectors.toList());
-    }
-
     //Busca a proxima regiao com maior quantidade de cores possiveis
     public Region getNextFC() {
-        return regions.stream().max(Comparator.comparing(r -> r.nRemainingColors())).get();
+        this.ordered.sort(MVR.reversed());
+        return this.ordered.pop();
     }
 
     //Busca a proxima regiao com possibilidades mais restritas
@@ -66,10 +60,11 @@ public class Graph {
     }
 
     public Region getNextByMVRandDegree() {
-        Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
-        Comparator<Region> MVR = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
-        this.ordered.sort(byDegree.reversed().thenComparing(MVR));
-        return this.ordered.pop();
+        if (this.ordered.size() > 0) {
+            this.ordered.sort(byDegree.reversed().thenComparing(MVR));
+            return this.ordered.pop();
+        }
+        return null;
     }
 
     //Verifica se todas as regioes ainda possuem cores possiveis remanescentes
@@ -113,6 +108,7 @@ public class Graph {
                 r.insertRemainingColors(r.getColor());
             }
         }
+        this.ordered.add(region);
         region.setColor(0);
     }
 
@@ -143,6 +139,7 @@ public class Graph {
         }
     }
 
+    //Backtraking recursivo simples
     public boolean recursiveBacktracking(Region r) {
         for (int c = 1; c < 5; c++) {
             r.setColor(c);
@@ -158,6 +155,7 @@ public class Graph {
         return false;
     }
 
+    //Backtraking com verificacao adiante
     public boolean backtrakingFC(Region r) {
         for (int c : r.getRemainingColors()) {
             refreshPossibleColors(r, c);
@@ -172,6 +170,7 @@ public class Graph {
         return false;
     }
 
+    //Backtraking com verificacao adiante e MVR
     public boolean backtrakingFCMVR(Region r) {
         for (int c : r.getRemainingColors()) {
             refreshPossibleColors(r, c);
@@ -186,26 +185,31 @@ public class Graph {
         return false;
     }
 
+    //Backtraking com verificacao adiante, MVR e heuristica de grau
     public boolean backtrakingFCMVRByDegree(Region r) {
-        for (int c : r.getRemainingColors()) {
-            refreshPossibleColors(r, c);
-            if (fowardChecking()) {
-                Region next = getNextByMVRandDegree();
-                if (next.getColor() == 0)
-                    return backtrakingFC(next);
-                else return true;
+        if (r != null) {
+            for (int c : r.getRemainingColors()) {
+                refreshPossibleColors(r, c);
+                if (fowardChecking()) {
+                    Region next = getNextByMVRandDegree();
+                    if (next != null && next.getColor() == 0)
+                        return backtrakingFCMVRByDegree(next);
+                    else return true;
+                }
+                resetPossibleColors(r);
             }
-            resetPossibleColors(r);
         }
         return false;
     }
 
+    //Imprime as cores do mapa
     public void printColors() {
         for (int i = 0; i < this.size;  i++) {
             regions.get(i).printColor();
         }
     }
 
+    //Imprime o grafo
     public void printGraph() {
         for (int i = 0; i < this.size;  i++) {
             regions.get(i).printRegion();
