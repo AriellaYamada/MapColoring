@@ -9,7 +9,7 @@ public class Region {
     private LinkedList<String> adjRegion;
     private List<Integer> remainingColors;
 
-
+    //Construtor
     public Region(String name, String[] edges) {
         this.name = name;
         this.color = 0;
