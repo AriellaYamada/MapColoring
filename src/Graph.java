@@ -46,16 +46,8 @@ public class Graph {
     }
 
     public Region getNextFC(Region r) {
-        LinkedList<Region> list = new LinkedList<>();
-        if (r.hasAdjRegion()) {
-            for(String name : r.getAdjRegion()){
-                list.add(getRegion(name));
-            }
-            Comparator<Region> byRemainingColors = (r1, r2) ->  Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
-            return list.stream()
-                    .max(byRemainingColors).get();
-        }
-        return null;
+        Comparator<Region> byRemainingColors = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
+        return regions.stream().max(byRemainingColors).get();
     }
 
     public boolean fowardChecking () {
