@@ -143,6 +143,7 @@ public class Graph {
                     return backtrakingFC(next);
                 else return true;
             }
+            resetPossibleColors(r);
         }
         return false;
     }
