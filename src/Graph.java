@@ -10,10 +10,12 @@ public class Graph {
     private int size;
     private LinkedList<Region> regions;
     private Stream<Region> stream;
+    private LinkedList<Region> ordered;
 
     public Graph(int size) {
         this.size = size;
-        regions = new LinkedList<Region>();
+        this.regions = new LinkedList<Region>();
+        this.ordered = new LinkedList<>();
     }
 
     public int getSize() {
@@ -21,7 +23,8 @@ public class Graph {
     }
 
     public void insertVertex(Region r){
-        regions.add(r);
+        this.regions.add(r);
+        this.ordered.add(r);
     }
 
     public Region getRegion(String region) {
@@ -65,8 +68,8 @@ public class Graph {
     public Region getNextByMVRandDegree() {
         Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
         Comparator<Region> MVR = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
-        this.regions.sort(MVR.thenComparing(byDegree.reversed()));
-        return this.regions.getFirst();
+        this.ordered.sort(byDegree.reversed().thenComparing(MVR));
+        return this.ordered.pop();
     }
 
     //Verifica se todas as regioes ainda possuem cores possiveis remanescentes
@@ -133,7 +136,7 @@ public class Graph {
                     //Backtracking com verificacao adiante, MVR e grau
                     case 'd':
                         r = getNextByMVRandDegree();
-                        backtrakingFCMVR(r);
+                        backtrakingFCMVRByDegree(r);
                         break;
                 }
             }
