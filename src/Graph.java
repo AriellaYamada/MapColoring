@@ -66,10 +66,13 @@ public class Graph {
     }
 
     public Region getNextByMVRandDegree() {
-        Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
-        Comparator<Region> MVR = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
-        this.ordered.sort(byDegree.reversed().thenComparing(MVR));
-        return this.ordered.pop();
+        if (this.ordered.size() > 0) {
+            Comparator<Region> byDegree = (r1, r2) -> Integer.compare(r1.getAdjRegion().size(), r2.getAdjRegion().size());
+            Comparator<Region> MVR = (r1, r2) -> Integer.compare(r1.nRemainingColors(), r2.nRemainingColors());
+            this.ordered.sort(byDegree.reversed().thenComparing(MVR));
+            return this.ordered.pop();
+        }
+        return null;
     }
 
     //Verifica se todas as regioes ainda possuem cores possiveis remanescentes
@@ -187,15 +190,17 @@ public class Graph {
     }
 
     public boolean backtrakingFCMVRByDegree(Region r) {
-        for (int c : r.getRemainingColors()) {
-            refreshPossibleColors(r, c);
-            if (fowardChecking()) {
-                Region next = getNextByMVRandDegree();
-                if (next.getColor() == 0)
-                    return backtrakingFC(next);
-                else return true;
+        if (r != null) {
+            for (int c : r.getRemainingColors()) {
+                refreshPossibleColors(r, c);
+                if (fowardChecking()) {
+                    Region next = getNextByMVRandDegree();
+                    if (next != null && next.getColor() == 0)
+                        return backtrakingFCMVRByDegree(next);
+                    else return true;
+                }
+                resetPossibleColors(r);
             }
-            resetPossibleColors(r);
         }
         return false;
     }
