@@ -17,11 +17,7 @@ public class Graph {
     public Graph(int size) {
         this.size = size;
         this.regions = new LinkedList<Region>();
-        this.ordered = new LinkedList<>();
-    }
-
-    public int getSize() {
-        return size;
+        this.ordered = new LinkedList<Region>();
     }
 
     public void insertVertex(Region r){
@@ -33,18 +29,6 @@ public class Graph {
         return regions.stream()
                 .filter(r -> r.getName().equals(region))
                 .findFirst().get();
-    }
-
-    //Retorna todas as regioes adjacentes
-    public void getAdjRegions(Region r) {
-        if (r.hasAdjRegion()) {
-            LinkedList<String> list = r.getAdjRegion();
-            this.ordered.clear();
-            for (String n : list) {
-                Region next = getRegion(n);
-                this.ordered.add(next);
-            }
-        }
     }
 
     //Busca a proxima regiao adjacente de uma regiao dada
@@ -154,11 +138,8 @@ public class Graph {
     public boolean recursiveBacktracking(Region r) {
         for (int c = 1; c < 5; c++) {
             r.setColor(c);
-            getAdjRegions(r);
             if(verifyAdjRegions(r)) {
-                Region next = this.ordered.pop();
-                while (next != null && next.getColor() != 0)
-                    next = this.ordered.pop();
+                Region next = getNextAdj(r);
                 if (next == null)
                     return true;
                 else
