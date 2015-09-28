@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MapColoring:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MapColoring_jar</output-path>
+    <root id="archive" name="MapColoring.jar">
+      <element id="module-output" name="MapColoring" />
+    </root>
+  </artifact>
+</component>
