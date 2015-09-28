@@ -33,14 +33,6 @@ public class Region {
         this.remainingColors.add(color);
     }
 
-    public void resetRemainingColors() {
-        this.remainingColors.clear();
-        for (int c = 1; c < 5; c++)
-            this.remainingColors.add(c);
-    }
-
-    public void resetRemainingColors(int c) { this.remainingColors.add(c); }
-
     public int getColor() {return this.color;}
 
     public LinkedList<String> getAdjRegion() {return this.adjRegion;}

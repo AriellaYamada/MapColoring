@@ -35,6 +35,18 @@ public class Graph {
                 .findFirst().get();
     }
 
+    //Retorna todas as regioes adjacentes
+    public void getAdjRegions(Region r) {
+        if (r.hasAdjRegion()) {
+            LinkedList<String> list = r.getAdjRegion();
+            this.ordered.clear();
+            for (String n : list) {
+                Region next = getRegion(n);
+                this.ordered.add(next);
+            }
+        }
+    }
+
     //Busca a proxima regiao adjacente de uma regiao dada
     public Region getNextAdj(Region r) {
         if (r.hasAdjRegion()) {
@@ -84,9 +96,8 @@ public class Graph {
                 if (adj.getColor() == color)
                     return false;
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
     //Atualiza as cores possiveis remanescentes do grafo de acordo com uma coloracao feita
@@ -143,8 +154,11 @@ public class Graph {
     public boolean recursiveBacktracking(Region r) {
         for (int c = 1; c < 5; c++) {
             r.setColor(c);
+            getAdjRegions(r);
             if(verifyAdjRegions(r)) {
-                Region next = getNextAdj(r);
+                Region next = this.ordered.pop();
+                while (next != null && next.getColor() != 0)
+                    next = this.ordered.pop();
                 if (next == null)
                     return true;
                 else
