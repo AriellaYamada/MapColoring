@@ -140,10 +140,10 @@ public class Graph {
             r.setColor(c);
             if(verifyAdjRegions(r)) {
                 Region next = getNextAdj(r);
-                if (next == null)
-                    return true;
-                else
-                    return recursiveBacktracking(next);
+                if (next != null && next.getColor() == 0) {
+                    if (recursiveBacktracking(next))
+                        return true;
+                } else return true;
             }
         }
         r.setColor(0);
@@ -151,16 +151,17 @@ public class Graph {
     }
 
     //Backtraking com verificacao adiante
-    public boolean backtrakingFC(Region r) {
-        for (int c : r.getRemainingColors()) {
-            refreshPossibleColors(r, c);
+    public boolean backtrakingFC(Region region) {
+        for (int color : region.getRemainingColors()) {
+            refreshPossibleColors(region, color);
             if (fowardChecking()) {
                 Region next = getNextFC();
-                if (next.getColor() == 0)
-                    return backtrakingFC(next);
-                else return true;
+                if(next != null && next.getColor() == 0) {
+                    if (backtrakingFC(next))
+                        return true;
+                } else return true;
             }
-            resetPossibleColors(r);
+            resetPossibleColors(region);
         }
         return false;
     }
@@ -171,9 +172,10 @@ public class Graph {
             refreshPossibleColors(r, c);
             if (fowardChecking()) {
                 Region next = getNextByMVRandDegree();
-                if (next.getColor() == 0)
-                    return backtrakingFCMVR(next);
-                else return true;
+                if (next.getColor() == 0) {
+                    if (backtrakingFCMVR(next))
+                        return true;
+                } else return true;
             }
             resetPossibleColors(r);
         }
@@ -182,17 +184,16 @@ public class Graph {
 
     //Backtraking com verificacao adiante, MVR e heuristica de grau
     public boolean backtrakingFCMVRByDegree(Region r) {
-        if (r != null) {
-            for (int c : r.getRemainingColors()) {
-                refreshPossibleColors(r, c);
-                if (fowardChecking()) {
-                    Region next = getNextByMVRandDegree();
-                    if (next != null && next.getColor() == 0)
-                        return backtrakingFCMVRByDegree(next);
-                    else return true;
-                }
-                resetPossibleColors(r);
+        for (int c : r.getRemainingColors()) {
+            refreshPossibleColors(r, c);
+            if (fowardChecking()) {
+                Region next = getNextByMVRandDegree();
+                if (next != null && next.getColor() == 0) {
+                    if (backtrakingFCMVRByDegree(next))
+                        return true;
+                } else return true;
             }
+            resetPossibleColors(r);
         }
         return false;
     }
