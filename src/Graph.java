@@ -50,11 +50,6 @@ public class Graph {
         return this.ordered.pop();
     }
 
-    //Busca a proxima regiao com possibilidades mais restritas
-    public Region getNextMVR() {
-        return regions.stream().min(Comparator.comparing(r -> r.nRemainingColors())).get();
-    }
-
     public Region getNextByMVRandDegree() {
         if (this.ordered.size() > 0) {
             this.ordered.sort(byDegree.reversed().thenComparing(MVR));
@@ -136,8 +131,8 @@ public class Graph {
 
     //Backtraking recursivo simples
     public boolean recursiveBacktracking(Region r) {
-        for (int c = 1; c < 5; c++) {
-            r.setColor(c);
+        for (int color = 1; color < 5; color++) {
+            r.setColor(color);
             if(verifyAdjRegions(r)) {
                 Region next = getNextAdj(r);
                 if (next != null && next.getColor() == 0) {
@@ -145,8 +140,8 @@ public class Graph {
                         return true;
                 } else return true;
             }
+            r.setColor(0);
         }
-        r.setColor(0);
         return false;
     }
 
